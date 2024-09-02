@@ -17,6 +17,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from '@mui/system';
+import { useAuth } from "./hooks/useAuth.js";
 
 const Background = styled(Box)({
   height: '100vh',
@@ -63,6 +64,7 @@ const StatusDot = styled(Box)(({ status }) => ({
 }));
 
 export default function ProjectDetails() {
+  useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { projectId } = location.state || {};
@@ -73,13 +75,14 @@ export default function ProjectDetails() {
   const [editedProject, setEditedProject] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
   const [statusOptions, setStatusOptions] = useState(['Ongoing', 'Terminated', 'Completed', 'Yet to Start']);
-  
+
   useEffect(() => {
     if (projectId) {
-      axios.get(`http://localhost:5000/getProject/id/${projectId}`,{ withCredentials: true })
+      axios.get(`http://localhost:5000/getProject/id/${projectId}`, { withCredentials: true })
         .then(response => {
           const projectData = response.data;
           projectData.deadline = formatDate(projectData.deadline);
+          projectData.teams = projectData.teams || []; // Ensure teams is an array
           setProject(projectData);
           setEditedProject(projectData); 
           setLoading(false);
@@ -114,7 +117,7 @@ export default function ProjectDetails() {
   };
 
   const handleSave = () => {
-    axios.put(`http://localhost:5000/editProject/id/${projectId}`, editedProject,{ withCredentials: true })
+    axios.put(`http://localhost:5000/editProject/id/${projectId}`, editedProject, { withCredentials: true })
       .then(() => {
         setProject(editedProject); // Update the project state with edited data
         setIsEditing(false);
@@ -131,7 +134,7 @@ export default function ProjectDetails() {
 
   const handleStatusClose = (status) => {
     if (status) {
-      axios.put(`http://localhost:5000/editProject/id/${projectId}`, { ...editedProject, status },{ withCredentials: true })
+      axios.put(`http://localhost:5000/editProject/id/${projectId}`, { ...editedProject, status }, { withCredentials: true })
         .then(() => {
             setEditedProject((prev) => ({ ...prev, status }));
           setProject((prev) => ({ ...prev, status }));
@@ -229,7 +232,7 @@ export default function ProjectDetails() {
                     project.name || 'N/A'
                   )}</TableCell>
                 </TableRow>
-                <TableRow>
+                {/*<TableRow>
                   <TableCell>Manager</TableCell>
                   <TableCell>{isEditing ? (
                     <TextField
@@ -241,16 +244,23 @@ export default function ProjectDetails() {
                   ) : (
                     project.manager || 'N/A'
                   )}</TableCell>
+                </TableRow>*/}
+                <TableRow>
+                  <TableCell>Manager</TableCell>
+                  <TableCell>
+                    {project.manager || 'N/A'}
+                  </TableCell>
                 </TableRow>
+
                 <TableRow>
                   <TableCell>Teams</TableCell>
                   <TableCell>
-                    {project.teams && project.teams.length > 0 ? (
+                    {Array.isArray(project.teams) && project.teams.length > 0 ? (
                       project.teams.map((team, index) => (
                         <Box key={index} mb={2}>
-                          <Typography variant="subtitle1"><strong>Team Name:</strong> {team.name}</Typography>
-                          <Typography variant="subtitle1"><strong>Leader:</strong> {team.leader}</Typography>
-                          <Typography variant="subtitle1"><strong>Members:</strong> {team.members.join(', ')}</Typography>
+                          <Typography variant="subtitle1"><strong>Team Name:</strong> {team.name || 'N/A'}</Typography>
+                          <Typography variant="subtitle1"><strong>Leader:</strong> {team.leaderName || 'N/A'}</Typography>
+                          <Typography variant="subtitle1"><strong>Members:</strong> {Array.isArray(team.membersNames) ? team.membersNames.join(', ') : 'N/A'}</Typography>
                         </Box>
                       ))
                     ) : (

@@ -1,11 +1,13 @@
-// src/pages/AddProject.js
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, TextField, Button, Paper } from '@mui/material';
+import { Box, Typography, TextField, Button, Paper, IconButton, Chip } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useProject } from './context/ProjectContext';
+import CloseIcon from '@mui/icons-material/Close';
+import { useAuth } from "./hooks/useAuth.js";
 
 export default function AddProject() {
+  useAuth();
   const { project, setProject } = useProject();
   const [employees, setEmployees] = useState([]);
   const navigate = useNavigate();
@@ -43,8 +45,17 @@ export default function AddProject() {
     navigate('/employee-list', { state: { type: 'members', index: teamIndex } });
   };
 
+  const handleRemoveMember = (teamIndex, memberIndex) => {
+    setProject(prev => {
+      const newTeams = [...prev.teams];
+      newTeams[teamIndex].members.splice(memberIndex, 1);
+      newTeams[teamIndex].membersNames.splice(memberIndex, 1);
+      return { ...prev, teams: newTeams };
+    });
+  };
+
   const handleSubmit = () => {
-    console.log(project)
+    console.log(project);
     axios.post('http://localhost:5000/addproject/new', project, { withCredentials: true })
       .then(() => navigate('/home'))
       .catch(error => console.error('Error adding project:', error));
@@ -84,24 +95,26 @@ export default function AddProject() {
             onClick={() => navigate('/employee-list', { state: { type: 'leader', index } })}
             sx={{ marginBottom: '15px' }}
           />
-          <TextField
-            label="Team Members"
-            fullWidth
-            value={Array.isArray(team.membersNames) ? team.membersNames.join(', ') : ''}
-            InputProps={{
-              endAdornment: (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleAddMember(index)}
-                  style={{ height: '40px', width: '100px' }}
-                >
-                  Add
-                </Button>
-              )
-            }}
-            sx={{ marginBottom: '15px' }}
-          />
+          <Box sx={{ marginBottom: '15px' }}>
+            <Typography variant="body1" gutterBottom>Team Members</Typography>
+            {(team.membersNames || []).map((memberName, memberIndex) => (
+              <Chip
+                key={memberIndex}
+                label={memberName}
+                onDelete={() => handleRemoveMember(index, memberIndex)}
+                sx={{ margin: '2px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}
+                deleteIcon={<CloseIcon />}
+              />
+            ))}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleAddMember(index)}
+              style={{ height: '40px', width: '100px', marginTop: '10px' }}
+            >
+              Add
+            </Button>
+          </Box>
           <Button
             variant="contained"
             color="secondary"

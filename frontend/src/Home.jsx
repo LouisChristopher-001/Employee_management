@@ -138,6 +138,11 @@ export default function Home() {
     navigate('/add-employee');
   };
 
+  
+  const handleUploadEmployeeClick = () => {
+    navigate('/upload-employee');
+  };
+
   const handleAddProjectClick = () => {
     navigate('/add-project');
   };
@@ -174,6 +179,7 @@ export default function Home() {
         console.log(response.data);
         // Optionally, you can handle any state updates or cleanup here
         navigate('/'); // Navigate to the home page or login page after logout
+        alert('Logged out successfully!!');
       })
       .catch(error => {
         console.error('Error during logout:', error);
@@ -262,6 +268,13 @@ export default function Home() {
                   onChange={handleSearchChange}
                   sx={{ marginRight: '10px', width: '250px' }}
                 />
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: '#4caf50', color: '#fff', '&:hover': { backgroundColor: '#45a049' }, height: '40px', marginRight: '10px'  }}
+                  onClick={handleUploadEmployeeClick}
+                >
+                  Upload
+                </Button>
                 <Button
                   variant="contained"
                   sx={{ backgroundColor: '#4caf50', color: '#fff', '&:hover': { backgroundColor: '#45a049' }, height: '40px' }}

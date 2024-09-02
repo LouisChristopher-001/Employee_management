@@ -78,7 +78,7 @@ export default function AddEmployee() {
   });
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setActiveStep( activeStep + 1);
   };
 
   const handleBack = () => {

@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from '@mui/system';
 import { useAuth } from "./hooks/useAuth.js";
+
 const Background = styled(Box)({
   height: '100vh',
   backgroundColor: '#fff',
@@ -55,7 +56,6 @@ export default function EmployeeDetails() {
   const { employeeId } = location.state || {};
   const [employee, setEmployee] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [empprojects,setEmpprojects]=useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -63,28 +63,38 @@ export default function EmployeeDetails() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [statusOptions, setStatusOptions] = useState(['Active', 'Terminated', 'Resigned', 'Retired']);
 
+  const qualificationOptions = ['B.E', 'M.E', 'B.Tech', 'M.Tech', 'BBA', 'MBA', 'MCA', 'BCA', 'B.Sc', 'M.Sc'];
+  const roleOptions = ['Intern', 'Trainee', 'Junior', 'Senior', 'Team Lead', 'Manager'];
 
-  
   useEffect(() => {
     if (employeeId) {
-      axios.get(`http://localhost:5000/getEmployee/id/${employeeId}`,{ withCredentials: true })
+      axios.get(`http://localhost:5000/getEmployee/id/${employeeId}`, { withCredentials: true })
         .then(response => {
           const employeeData = response.data;
           employeeData.joining_date = formatDate(employeeData.joining_date);
           employeeData.DoB = formatDate(employeeData.DoB);
           const projectIds = employeeData.projects?.projectId || [];
-          if (Array.isArray(projectIds) && projectIds.length > 0) {
-            axios.get(`http://localhost:5000/getProject/id/${projectIds[0]}`, { withCredentials: true })
-              .then(response => {
-                setProjects([response.data]); // Assuming only one project ID per employee
-                setEmpprojects(response.data); // Set the projects for later use
-              })
-              .catch(error => console.error('Error fetching projects:', error));
-          }
-          setEmployee(employeeData);
-          setEditedEmployee(employeeData); 
-          setLoading(false);
           
+          if (Array.isArray(projectIds) && projectIds.length > 0) {
+            // Fetch all projects by IDs
+            Promise.all(
+              projectIds.map(id =>
+                axios.get(`http://localhost:5000/getProject/id/${id}`, { withCredentials: true })
+                  .then(response => response.data)
+              )
+            )
+            .then(projects => {
+              // setProjects(projects); // Set the fetched projects
+              // setEmpprojects(projects.map(project => project.name)); // Store only project names for display
+              setProjects(projects.map(project => ({ id: project._id, name: project.name }))); // Store project names and IDs for display
+
+            })
+            .catch(error => console.error('Error fetching projects:', error));
+          }
+          
+          setEmployee(employeeData);
+          setEditedEmployee(employeeData);
+          setLoading(false);
         })
         .catch(error => {
           console.error('Error fetching employee data:', error);
@@ -96,11 +106,12 @@ export default function EmployeeDetails() {
       setLoading(false);
     }
   }, [employeeId]);
+  
 
   const formatDate = (date) => {
-    if (!date) return ''; // Return an empty string for invalid or undefined dates
+    if (!date) return '';
     const formattedDate = new Date(date);
-    return !isNaN(formattedDate) ? formattedDate.toISOString().split('T')[0] : ''; // Check for valid date
+    return !isNaN(formattedDate) ? formattedDate.toISOString().split('T')[0] : '';
   };
 
   const handleEditClick = () => {
@@ -116,9 +127,9 @@ export default function EmployeeDetails() {
   };
 
   const handleSave = () => {
-    axios.put(`http://localhost:5000/editEmployee/editbyid/${employeeId}`, editedEmployee,{ withCredentials: true })
+    axios.put(`http://localhost:5000/editEmployee/editbyid/${employeeId}`, editedEmployee, { withCredentials: true })
       .then(() => {
-        setEmployee(editedEmployee); // Update the employee state with edited data
+        setEmployee(editedEmployee);
         setIsEditing(false);
       })
       .catch(error => {
@@ -133,7 +144,7 @@ export default function EmployeeDetails() {
 
   const handleStatusClose = (status) => {
     if (status) {
-      axios.put(`http://localhost:5000/editEmployee/editbyid/${employeeId}`, { ...editedEmployee, status },{ withCredentials: true })
+      axios.put(`http://localhost:5000/editEmployee/editbyid/${employeeId}`, { ...editedEmployee, status }, { withCredentials: true })
         .then(() => {
           setEditedEmployee((prev) => ({ ...prev, status }));
           setEmployee((prev) => ({ ...prev, status }));
@@ -226,55 +237,76 @@ export default function EmployeeDetails() {
                   { label: 'Email', value: 'email' },
                   { label: 'Address', value: 'address' },
                   { label: 'Aadhar Number', value: 'aadhar_number' },
-                  { label: 'Highest Qualification', value: 'highest_qualification' },
+                  {
+                    label: 'Highest Qualification',
+                    value: 'highest_qualification',
+                    type: 'select',
+                    options: qualificationOptions,
+                  },
                   { label: 'University', value: 'university' },
                   { label: 'Percentage', value: 'percentage' },
                   { label: 'Year of Graduation', value: 'year_of_graduation' },
                   { label: 'Previous Employer', value: 'previous_employer' },
                   { label: 'Years of Experience', value: 'years_of_experience' },
                   { label: 'Previous Role', value: 'previous_role' },
-                  { label: 'Current Role', value: 'current_role' },
+                  {
+                    label: 'Current Role',
+                    value: 'current_role',
+                    type: 'select',
+                    options: roleOptions,
+                  },
                   { label: 'Department', value: 'department' },
                   { label: 'Joining Date', value: 'joining_date' },
                   { label: 'Bank Name', value: 'bank_name' },
                   { label: 'Account Number', value: 'account_number' },
-                  { label: 'IFSC Code', value: 'ifsc_code' },
-                  { label: 'Projects', value: 'projects' }
-                ].map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{row.label}</TableCell>
+                  { label: 'IFSC Code', value: 'ifsc_code' }
+                ].map((field) => (
+                  <TableRow key={field.value}>
+                    <TableCell><strong>{field.label}</strong></TableCell>
                     <TableCell>
                       {isEditing ? (
-                        <TextField
-                          name={row.value}
-                          type={row.value === 'joining_date' || row.value === 'DoB' ? 'date' : 'text'}
-                          value={row.value === 'joining_date' || row.value === 'DoB' ? editedEmployee[row.value] || '' : editedEmployee[row.value] || ''}
-                          onChange={handleChange}
-                          fullWidth
-                          InputLabelProps={{ shrink: true }} // Ensure label is visible for date fields
-                        />
+                        field.type === 'select' ? (
+                          <TextField
+                            select
+                            name={field.value}
+                            value={editedEmployee[field.value] || ''}
+                            onChange={handleChange}
+                            fullWidth
+                          >
+                            {field.options.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        ) : (
+                          <TextField
+                            name={field.value}
+                            value={editedEmployee[field.value] || ''}
+                            onChange={handleChange}
+                            fullWidth
+                          />
+                        )
                       ) : (
-                        <>
-                          {row.value === 'projects' ? (
-                            <>
-                              {empprojects.name || 'N/A'}
-                            </>
-                          ) : (
-                            row.value === 'status' ? (
-                              <>
-                                <StatusDot status={employee[row.value]} />
-                                {employee[row.value]}
-                              </>
-                            ) : (
-                              employee[row.value] || 'N/A'
-                            )
-                          )}
-                        </>
+                        employee[field.value] || 'N/A'
                       )}
                     </TableCell>
                   </TableRow>
                 ))}
+                <TableRow>
+                  <TableCell><strong>Projects</strong></TableCell>
+                  <TableCell>
+                    {projects.length > 0 ? (
+                      projects.map((project, index) => (
+                        <Typography key={index}>{project.name}</Typography>
+                      ))
+                    ) : (
+                      'N/A'
+                    )}
+                  </TableCell>
+                </TableRow>
               </TableBody>
+
             </Table>
           </StyledTableContainer>
         </TableWrapper>
