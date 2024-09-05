@@ -34,17 +34,18 @@ const UploadEmployee = () => {
         const { name, value, files } = e.target;
         setFormData({
             ...formData,
-            [name]: files ? files[0] : value,
+            [name]: files ? files[0] : value,  
         });
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = new FormData();
-        data.append('excelFile', formData.excelFile);
+        data.append('uploadfile', formData.uploadfile);  // Ensure the key is 'uploadfile'
         if (formData.sheetName) data.append('sheetName', formData.sheetName);
         if (formData.rowStart) data.append('rowStart', formData.rowStart);
-
+    
         try {
             await axios.post('http://localhost:5000/excel/upload', data);
             navigate('/home');
@@ -52,6 +53,7 @@ const UploadEmployee = () => {
             console.error('Error uploading file:', error);
         }
     };
+    
 
     return (
         <Background>
@@ -65,7 +67,7 @@ const UploadEmployee = () => {
                         type="file"
                         label="Excel File"
                         margin="normal"
-                        name="excelFile"
+                        name="uploadfile"
                         onChange={handleChange}
                         required
                         InputLabelProps={{ shrink: true }}

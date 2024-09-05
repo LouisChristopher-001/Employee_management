@@ -22,7 +22,7 @@ exports.Editbyid = async (req, res) => {
             filter.phno = phno;
         }
 
-        console.log('Filter:', filter);
+      
 
         // Find the employee based on the constructed filter
         const employee = await EmployeeModel.findOne(filter);
@@ -30,7 +30,7 @@ exports.Editbyid = async (req, res) => {
         if (!employee) {
             return res.status(404).json({ error: 'Employee not found' });
         }
-        console.log('Employee:', employee);
+  
 
         // Update the employee record
         const updatedEmployee = await EmployeeModel.findOneAndUpdate(

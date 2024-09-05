@@ -4,9 +4,12 @@ import { Box, Typography, List, ListItem, ListItemText, IconButton, Tooltip } fr
 import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useProject } from './context/ProjectContext';  // Ensure the correct path
+import { useProject } from './context/ProjectContext';  
+import { useAuth } from "./hooks/useAuth.js";
+
 
 export default function EmployeeList() {
+  useAuth();
   const [employees, setEmployees] = useState([]);
   const [disabledEmployees, setDisabledEmployees] = useState(new Set());
   const navigate = useNavigate();
@@ -17,9 +20,28 @@ export default function EmployeeList() {
   useEffect(() => {
     // Fetch employee data from backend
     axios.get('http://localhost:5000/', { withCredentials: true })
-      .then(response => setEmployees(response.data))
+      .then(response => {
+        let data = response.data;
+        console.log(type);
+
+        // Filter or adjust data based on the type passed
+        if (type === 'manager') {
+          // Assuming 'isManager' or similar field exists to filter managers
+          data = data.filter(employee => employee.current_role==='Manager');
+        }
+
+        else if(type==='leader'){
+          data = data.filter(employee => employee.current_role==='Team Lead');
+        }
+
+        else{
+          data = data.filter(employee => employee.current_role!=='Team Lead' && employee.current_role!=='Manager');
+        }
+
+        setEmployees(data);
+      })
       .catch(error => console.error('Error fetching employees:', error));
-  }, []);
+  }, [type]);
 
   useEffect(() => {
     // Determine disabled employees based on current project state

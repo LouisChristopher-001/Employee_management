@@ -6,8 +6,16 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const jwt = require('jwt-simple');
+const jwtt = require('jsonwebtoken');
 const DBConnect = require(path.join(__dirname, 'config', 'DBConnection'));
 const cookieParser = require('cookie-parser');
+const excelToJson = require('convert-excel-to-json');
+const fs = require('fs');
+const multer = require('multer');
+const EmployeeModel = require('./models/employees');
+const SequenceModel = require('./models/seq');
+
+
 app.use(cookieParser());
 
 
@@ -16,31 +24,143 @@ dotenv.config({ path: path.join(__dirname, 'config', 'config.env') });
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const allowedOrigin = 'http://localhost:5173';
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: allowedOrigin,
   credentials: true
 }));
 
 DBConnect();
 const verifyToken = (req, res, next) => {
-  const verifytoken = req.cookies.token;
-  console.log("Cookies: ", req.cookies);
-  console.log("verfiyToken")
-  console.log(verifytoken);
-  
-
-  if (!verifytoken) {
+  const token = req.cookies.token; 
+  const origin = req.headers.origin;
+  if (origin !== allowedOrigin) {
+    return res.status(403).sendFile(path.join(__dirname, 'template', 'Error403.html'));
+    // return res.status(403).send('Access denied. Invalid origin , You are not authorised to access this resource.');
+  }
+  if (!token) {
     return res.status(401).send('Access denied. No token provided.');
   }
 
   try {
-    const decoded = jwt.decode(verifytoken, process.env.JWT_SECRET);
-    req.user = decoded; // Attach user info to request object
-    next(); // Proceed to the next middleware or route handler
+    const decoded = jwtt.verify(token, "jwt-access-token-secret-key");
+    req.user = decoded; 
+    
+    next(); 
   } catch (error) {
     return res.status(400).send('Invalid token.');
   }
 };
+const getLatestSequence = require(path.join(__dirname,'middleware','sequence'));
+
+const addemp = require(path.join(__dirname, 'routes', 'addemp'));
+const displayemp = require(path.join(__dirname, 'routes', 'displayemp'));
+const displayproject = require(path.join(__dirname, 'routes', 'displayproject'));
+const editbyid = require(path.join(__dirname, 'routes', 'editbyid'));
+const getbyid = require(path.join(__dirname, 'routes', 'getbyid'));
+const addproject = require(path.join(__dirname, 'routes', 'addproject'));
+const getProject = require(path.join(__dirname, 'routes', 'projectid'));
+const editproject = require(path.join(__dirname, 'routes', 'editproject'));
+
+global.__basedir = __dirname;
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "-" + Date.now() + "-" + file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
+
+app.post('/excel/upload', upload.single('uploadfile'), async (req, res) => {
+
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+  
+  const sheetName = req.body.sheetName || 'Sheet1'; 
+  const startRow = parseInt(req.body.rowStart) || 1; 
+
+  try {
+
+    const result = excelToJson({
+      sourceFile: req.file.path,
+      sheets: [{
+        name: sheetName, 
+        header: { rows: startRow - 1 }, 
+        columnToKey: { 
+          A: 'first_name',
+          B: 'last_name',
+          C: 'DoB',
+          D: 'email',
+          E: 'phone_number',
+          F: 'address',
+          G: 'aadhar_number',
+          H: 'highest_qualification',
+          I: 'university',
+          J: 'year_of_graduation',
+          K: 'percentage',
+          L: 'previous_employer',
+          M: 'years_of_experience',
+          N: 'previous_role',
+          O: 'current_role',
+          P: 'department',
+          Q: 'joining_date',
+          R: 'status',
+          S: 'bank_name',
+          T: 'account_number',
+          U: 'ifsc_code'
+        }
+      }]
+    });
+
+    
+    if (!result[sheetName]) {
+      return res.status(400).send(`Sheet "${sheetName}" not found`);
+    }
+    let seq = await getLatestSequence()
+    const employees = result[sheetName].map(row => ({
+      id:++seq,
+      first_name: row.first_name,
+      last_name: row.last_name,
+      DoB: new Date(row.DoB),
+      email: row.email,
+      phone_number: row.phone_number,
+      address: row.address,
+      aadhar_number: row.aadhar_number,
+      highest_qualification: row.highest_qualification,
+      university: row.university,
+      year_of_graduation: row.year_of_graduation,
+      percentage: row.percentage,
+      previous_employer: row.previous_employer,
+      years_of_experience: row.years_of_experience,
+      previous_role: row.previous_role,
+      current_role: row.current_role,
+      department: row.department,
+      joining_date: new Date(row.joining_date),
+      status: row.status,
+      bank_name: row.bank_name || "ABC Bank, OMR Branch, Chennai",
+      account_number: row.account_number,
+      ifsc_code: row.ifsc_code || "ABC2024260",
+      projects: { projectId: [] } 
+    }));
+
+    // Save all employee records to the database in bulk
+    await EmployeeModel.insertMany(employees);
+    await SequenceModel.updateOne({id:"id"},{seq:seq});
+    // delete the uploaded file after processing
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({ message: 'File uploaded and processed successfully' });
+  } catch (error) {
+    console.error('Error processing file:', error.message);
+    res.status(500).send('Error processing file');
+  }
+});
+
+
 
 // Store OTPs in memory (for demonstration purposes; use a database in production)
 let otpStore = {};
@@ -70,7 +190,7 @@ app.post('/login', (req, res) => {
   const { otp: storedOtp, timestamp } = otpStore[email];
   const currentTime = Date.now();
 
-  // Validate OTP expiration (e.g., 5 minutes validity)
+  // Validate OTP expiration (5 minutes validity)
   if (currentTime - timestamp > 5 * 60 * 1000) {
     delete otpStore[email]; // Clear expired OTP
     return res.status(400).send('OTP expired');
@@ -82,41 +202,29 @@ app.post('/login', (req, res) => {
 
   delete otpStore[email]; // Clear OTP after successful validation
 
-  // Generate JWT token (for demonstration purposes)
-  const token = jwt.encode({ email }, process.env.JWT_SECRET, 'HS256');
-  console.log(token);
+  // Generate JWT token 
+  const accessToken = jwt.encode({ email }, process.env.JWT_SECRET, 'HS256');
+  const token = jwtt.sign({email: email}, 
+    "jwt-access-token-secret-key", {expiresIn: '1h'})
   res.cookie('token', token, {
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    maxAge: 60 * 60 * 1000, // 1 hr
     httpOnly: false,
-    secure: false, // Set to true in production with HTTPS
-    sameSite: 'Lax', // Or 'None' if using cross-site requests
+    secure: true, 
+    sameSite: 'None', 
+    path:'/',
   });
-  
-  console.log(res.getHeaders());
-
   return res.status(200).json({ token });
 });
 
-// Routes
-const addemp = require(path.join(__dirname, 'routes', 'addemp'));
-const displayemp = require(path.join(__dirname, 'routes', 'displayemp'));
-const displayproject = require(path.join(__dirname, 'routes', 'displayproject'));
-const editbyid = require(path.join(__dirname, 'routes', 'editbyid'));
-const getbyid = require(path.join(__dirname, 'routes', 'getbyid'));
-const addproject = require(path.join(__dirname, 'routes', 'addproject'));
-const getProject = require(path.join(__dirname, 'routes', 'projectid'));
-const editproject = require(path.join(__dirname, 'routes', 'editproject'));
 
+app.use('/',verifyToken, displayemp); 
 app.use('/addEmployee/', verifyToken, addemp);
-app.use('/',verifyToken, displayemp); // Public route
 app.use('/projects/', verifyToken, displayproject);
 app.use('/getEmployee/', verifyToken, getbyid);
 app.use('/editEmployee/', verifyToken, editbyid);
 app.use('/addProject', verifyToken, addproject);
 app.use('/getProject/', verifyToken, getProject);
 app.use('/editProject/', verifyToken, editproject);
-
-
 
 const oAuth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -161,13 +269,11 @@ async function sendMail(email, otp) {
   }
 }
 
-
 app.post('/logout', (req, res) => {
-  res.clearCookie('token', { path: '/' }); // Specify the path if needed
-
-  console.log(res.getHeaders());
+  res.clearCookie('token', { path: '/' });
   return res.status(200).send('Logged out successfully');
 });
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on http://localhost:${process.env.PORT}`);
 });

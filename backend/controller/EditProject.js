@@ -11,7 +11,6 @@ exports.editProject = async (req, res) => {
         const filter ={};
             filter._id = id;
 
-        console.log('Filter:', filter);
 
         // Find the employee based on the constructed filter
         const project = await ProjectModel.findOne(filter);

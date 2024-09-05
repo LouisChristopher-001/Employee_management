@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Card, CardContent, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -44,18 +44,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.post('http://localhost:5000/logout', {}, { withCredentials: true })
-      .then(response => {
-        console.log(response.data);
-        // Optionally, you can handle any state updates or cleanup here
-        navigate('/'); // Navigate to the home page or login page after logout
-      })
-      .catch(error => {
-        console.error('Error during logout:', error);
-      });
-  }, []);
-
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -79,10 +67,12 @@ export default function Login() {
     }
   };
 
+
   const handleLogin = async () => {
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/login', { email, otp }, { withCredentials: true });
+      console.log('Login response:', response); // Log the response
       const { token } = response.data;
       localStorage.setItem('authToken', token);
       navigate('/home');
@@ -93,6 +83,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+  
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {

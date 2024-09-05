@@ -78,7 +78,7 @@ export default function AddEmployee() {
   });
 
   const handleNext = () => {
-    setActiveStep( activeStep + 1);
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
@@ -95,7 +95,7 @@ export default function AddEmployee() {
   const handleSubmit = () => {
     console.log('Submitting form data:', formData);
 
-    axios.post('http://localhost:5000/addEmployee', formData,{ withCredentials: true })
+    axios.post('http://localhost:5000/addEmployee', formData , { withCredentials: true })
       .then(response => {
         console.log('Employee added:', response.data);
         navigate('/home');
@@ -222,7 +222,7 @@ export default function AddEmployee() {
                 Current Role and Designation
               </Typography>
               <TextField fullWidth select label="Current Role" margin="normal" name="current_role" value={formData.current_role} onChange={handleChange} required>
-                {['Intern', 'Trainee', 'Junior', 'Senior'].map((option) => (
+                {['Intern', 'Trainee', 'Junior', 'Senior','Team Lead','Manager'].map((option) => (
                   <CustomMenuItem key={option} value={option}>
                     {option}
                   </CustomMenuItem>

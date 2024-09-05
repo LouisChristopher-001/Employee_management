@@ -24,7 +24,6 @@ exports.createEmployee = async (req, res) => {
         // }
 
         // Create a new employee if no duplicates found
-        console.log(employeeData);
         
         await EmployeeModel.create(employeeData);
         return res.status(201).json({ message: 'Employee created successfully' });
