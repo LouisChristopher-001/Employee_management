@@ -27,6 +27,7 @@ app.use(express.json());
 const allowedOrigin = 'https://employee-management-fe-delta.vercel.app';
 app.use(cors({
   origin: allowedOrigin,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
