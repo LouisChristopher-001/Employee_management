@@ -78,7 +78,7 @@ export default function ProjectDetails() {
 
   useEffect(() => {
     if (projectId) {
-      axios.get(`employee-management-be-six.vercel.app/getProject/id/${projectId}`, { withCredentials: true })
+      axios.get(`https://employee-management-be-six.vercel.app/getProject/id/${projectId}`, { withCredentials: true })
         .then(response => {
           const projectData = response.data;
           projectData.deadline = formatDate(projectData.deadline);
@@ -117,7 +117,7 @@ export default function ProjectDetails() {
   };
 
   const handleSave = () => {
-    axios.put(`employee-management-be-six.vercel.app/editProject/id/${projectId}`, editedProject, { withCredentials: true })
+    axios.put(`https://employee-management-be-six.vercel.app/editProject/id/${projectId}`, editedProject, { withCredentials: true })
       .then(() => {
         setProject(editedProject); // Update the project state with edited data
         setIsEditing(false);
@@ -134,7 +134,7 @@ export default function ProjectDetails() {
 
   const handleStatusClose = (status) => {
     if (status) {
-      axios.put(`employee-management-be-six.vercel.app/editProject/id/${projectId}`, { ...editedProject, status }, { withCredentials: true })
+      axios.put(`https://employee-management-be-six.vercel.app/editProject/id/${projectId}`, { ...editedProject, status }, { withCredentials: true })
         .then(() => {
             setEditedProject((prev) => ({ ...prev, status }));
           setProject((prev) => ({ ...prev, status }));

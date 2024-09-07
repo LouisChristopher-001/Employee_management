@@ -95,7 +95,7 @@ export default function AddEmployee() {
   const handleSubmit = () => {
     console.log('Submitting form data:', formData);
 
-    axios.post('employee-management-be-six.vercel.app/addEmployee', formData , { withCredentials: true })
+    axios.post('https://employee-management-be-six.vercel.app/addEmployee', formData , { withCredentials: true })
       .then(response => {
         console.log('Employee added:', response.data);
         navigate('/home');
