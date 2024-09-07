@@ -119,7 +119,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/',{ withCredentials: true })
+    axios.get('employee-management-be-six.vercel.app/',{ withCredentials: true })
       .then(response => {
         setEmployees(response.data);
         // Extract unique departments
@@ -129,7 +129,7 @@ export default function Home() {
       .catch(error => console.error('Error fetching employees:', error));
 
     // Fetch projects
-    axios.get('http://localhost:5000/projects/',{ withCredentials: true })
+    axios.get('employee-management-be-six.vercel.app/projects/',{ withCredentials: true })
       .then(response => setProjects(response.data))
       .catch(error => console.error('Error fetching projects:', error));
   }, []);
@@ -174,7 +174,7 @@ export default function Home() {
 
   const handleLogout = () => {
     
-    axios.post('http://localhost:5000/logout', {}, { withCredentials: true })
+    axios.post('employee-management-be-six.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
         console.log(response.data);
         // Optionally, you can handle any state updates or cleanup here

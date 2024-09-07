@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.js", // Replace with your main backend file name
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/app.js" // Replace with your main backend file name
+    }
+  ],
+  "env": {
+    "PORT": "5000",
+    "JWT_SECRET": "@jwt_secret",
+    "CLIENT_ID": "913726941026-6j31se5q661b5h84dqm1su9rjvd89i52.apps.googleusercontent.com",
+    "CLIENT_SECRET": "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",
+    "REFRESH_TOKEN": "1//04rKyypPrWWVXCgYIARAAGAQSNwF-L9Iro8CX2lt3ZysfVyQTXlPsk4x-UmhIQidlz9qSC4dR9NJlV8VOSYih018JcUM92XhrfNQ",
+    "GMAIL_USER": "louischristopherengg@gmail.com",
+    "NODE_ENV": "production",
+    "REDIRECT_URI":"https://employee-management-be-six.vercel.app",
+    "DB_URL":"mongodb+srv://louischristopher784:louis35007@cluster0.2qcrkdo.mongodb.net/EMS?retryWrites=true&w=majority"
+  }
+}

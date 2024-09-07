@@ -24,13 +24,21 @@ dotenv.config({ path: path.join(__dirname, 'config', 'config.env') });
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const allowedOrigin = 'http://localhost:5173';
+const allowedOrigin = 'https://employee-management-fe-delta.vercel.app';
 app.use(cors({
   origin: allowedOrigin,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
 
 DBConnect();
+
+app.options('*', cors({
+  origin: allowedOrigin,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token; 
   const origin = req.headers.origin;
