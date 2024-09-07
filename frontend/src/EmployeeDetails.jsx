@@ -68,7 +68,7 @@ export default function EmployeeDetails() {
 
   useEffect(() => {
     if (employeeId) {
-      axios.get(`https://employee-management-be-six.vercel.app/getEmployee/id/${employeeId}`, { withCredentials: true })
+      axios.get(`https://employee-management-bend.vercel.app/getEmployee/id/${employeeId}`, { withCredentials: true })
         .then(response => {
           const employeeData = response.data;
           employeeData.joining_date = formatDate(employeeData.joining_date);
@@ -79,7 +79,7 @@ export default function EmployeeDetails() {
             // Fetch all projects by IDs
             Promise.all(
               projectIds.map(id =>
-                axios.get(`https://employee-management-be-six.vercel.app/getProject/id/${id}`, { withCredentials: true })
+                axios.get(`https://employee-management-bend.vercel.app/getProject/id/${id}`, { withCredentials: true })
                   .then(response => response.data)
               )
             )
@@ -127,7 +127,7 @@ export default function EmployeeDetails() {
   };
 
   const handleSave = () => {
-    axios.put(`https://employee-management-be-six.vercel.app/editEmployee/editbyid/${employeeId}`, editedEmployee, { withCredentials: true })
+    axios.put(`https://employee-management-bend.vercel.app/editEmployee/editbyid/${employeeId}`, editedEmployee, { withCredentials: true })
       .then(() => {
         setEmployee(editedEmployee);
         setIsEditing(false);
@@ -144,7 +144,7 @@ export default function EmployeeDetails() {
 
   const handleStatusClose = (status) => {
     if (status) {
-      axios.put(`https://employee-management-be-six.vercel.app/editEmployee/editbyid/${employeeId}`, { ...editedEmployee, status }, { withCredentials: true })
+      axios.put(`https://employee-management-bend.vercel.app/editEmployee/editbyid/${employeeId}`, { ...editedEmployee, status }, { withCredentials: true })
         .then(() => {
           setEditedEmployee((prev) => ({ ...prev, status }));
           setEmployee((prev) => ({ ...prev, status }));

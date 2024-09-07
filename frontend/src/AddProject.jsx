@@ -14,7 +14,7 @@ export default function AddProject() {
 
   useEffect(() => {
     // Fetch employee data from backend
-    axios.get('https://employee-management-be-six.vercel.app/', { withCredentials: true })
+    axios.get('https://employee-management-bend.vercel.app/', { withCredentials: true })
       .then(response => setEmployees(response.data))
       .catch(error => console.error('Error fetching employees:', error));
   }, []);
@@ -56,7 +56,7 @@ export default function AddProject() {
 
   const handleSubmit = () => {
     console.log(project);
-    axios.post('https://employee-management-be-six.vercel.app/addproject/new', project, { withCredentials: true })
+    axios.post('https://employee-management-bend.vercel.app/addproject/new', project, { withCredentials: true })
       .then(() => navigate('/home'))
       .catch(error => console.error('Error adding project:', error));
   };

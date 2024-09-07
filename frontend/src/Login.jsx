@@ -56,7 +56,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await axios.post('https://employee-management-be-six.vercel.app/request-otp', { email }, { withCredentials: true });
+      await axios.post('https://employee-management-bend.vercel.app/request-otp', { email }, { withCredentials: true });
       setOtpSent(true);
       alert('OTP has been sent to your email.');
     } catch (error) {
@@ -71,7 +71,7 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('https://employee-management-be-six.vercel.app/login', { email, otp }, { withCredentials: true });
+      const response = await axios.post('https://employee-management-bend.vercel.app/login', { email, otp }, { withCredentials: true });
       console.log('Login response:', response); // Log the response
       const { token } = response.data;
       localStorage.setItem('authToken', token);

@@ -19,7 +19,7 @@ export default function EmployeeList() {
 
   useEffect(() => {
     // Fetch employee data from backend
-    axios.get('https://employee-management-be-six.vercel.app/', { withCredentials: true })
+    axios.get('https://employee-management-bend.vercel.app/', { withCredentials: true })
       .then(response => {
         let data = response.data;
         console.log(type);
