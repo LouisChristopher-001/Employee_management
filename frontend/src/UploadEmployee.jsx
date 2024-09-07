@@ -47,7 +47,7 @@ const UploadEmployee = () => {
         if (formData.rowStart) data.append('rowStart', formData.rowStart);
     
         try {
-            await axios.post('http://localhost:5000/excel/upload', data);
+            await axios.post('employee-management-be-six.vercel.app/excel/upload', data);
             navigate('/home');
         } catch (error) {
             console.error('Error uploading file:', error);
