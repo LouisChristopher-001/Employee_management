@@ -42,6 +42,7 @@ app.options('*', cors({
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token; 
   const origin = req.headers.origin;
+  console.log("1")
   if (origin !== allowedOrigin) {
     return res.status(403).sendFile(path.join(__dirname, 'template', 'Error403.html'));
     // return res.status(403).send('Access denied. Invalid origin , You are not authorised to access this resource.');
