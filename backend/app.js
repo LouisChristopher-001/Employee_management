@@ -199,7 +199,6 @@ app.post('/login', (req, res) => {
   const { otp: storedOtp, timestamp } = otpStore[email];
   const currentTime = Date.now();
 
-  // Validate OTP expiration (5 minutes validity)
   if (currentTime - timestamp > 5 * 60 * 1000) {
     delete otpStore[email]; // Clear expired OTP
     return res.status(400).send('OTP expired');
@@ -211,19 +210,21 @@ app.post('/login', (req, res) => {
 
   delete otpStore[email]; // Clear OTP after successful validation
 
-  // Generate JWT token 
-  const accessToken = jwt.encode({ email }, process.env.JWT_SECRET, 'HS256');
-  const token = jwtt.sign({email: email}, 
-    "jwt-access-token-secret-key", {expiresIn: '1h'})
+  // Generate JWT token
+  const token = jwtt.sign({ email: email }, "jwt-access-token-secret-key", { expiresIn: '1h' });
+
+  // Set cookie
   res.cookie('token', token, {
-    maxAge: 60 * 60 * 1000, // 1 hr
-    httpOnly: false,
-    secure: true, 
-    sameSite: 'None', 
-    path:'/',
+    maxAge: 60 * 60 * 1000, // 1 hour
+    httpOnly: true, // Set to true for security, to prevent client-side access
+    secure: true, // Set to true if using HTTPS
+    sameSite: 'None', // Allows cross-site cookies (needed if frontend and backend are on different subdomains)
+    path: '/', // Path where the cookie is valid
   });
-  return res.status(200).json({ token });
+
+  return res.status(200).json({ message: 'Login successful' });
 });
+
 
 
 app.use('/',verifyToken, displayemp); 

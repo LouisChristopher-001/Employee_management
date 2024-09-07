@@ -71,18 +71,28 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('https://employee-management-bend.vercel.app/login', { email, otp }, { withCredentials: true });
-      console.log('Login response:', response); // Log the response
+      const response = await axios.post(
+        'https://employee-management-be-six.vercel.app/login',
+        { email, otp },
+        { withCredentials: true } // This ensures cookies are sent and received
+      );
+      
+      console.log('Login response:', response); // Log the entire response for debugging
+  
+      // If you want to use the token from localStorage, you can still save it
       const { token } = response.data;
       localStorage.setItem('authToken', token);
+  
+      // Navigate to home or another authenticated route
       navigate('/home');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login failed:', error.response ? error.response.data : error.message);
       alert('Invalid OTP. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+  
   
 
   const handleKeyPress = (e) => {
