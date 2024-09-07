@@ -1,12 +1,24 @@
 {
-    "version":2,
-    "builds": [
-      { "src": "*.js", "use": "@vercel/node" }
-    ],
-    "routes": [
-        {
-          "src": "/(.*)",
-          "dest": "/"
-        }
-    ]
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.js", // Replace with your main backend file name
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/app.js" // Replace with your main backend file name
+    }
+  ],
+  "env": {
+    "PORT": "5000",
+    "JWT_SECRET": "@jwt_secret",
+    "CLIENT_ID": "@client_id",
+    "CLIENT_SECRET": "@client_secret",
+    "REFRESH_TOKEN": "@refresh_token",
+    "GMAIL_USER": "@gmail_user",
+    "NODE_ENV": "production"
   }
+}
