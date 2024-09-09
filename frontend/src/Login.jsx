@@ -153,7 +153,7 @@ export default function Login() {
               <SubmitButton
                 variant="contained"
                 fullWidth
-                onClick={handleLogin}
+                onClick={() => handleLogin}
                 disabled={loading || !otp}
               >
                 {loading ? <CircularProgress size={24} /> : 'Sign In'}
