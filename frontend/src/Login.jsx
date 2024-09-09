@@ -74,6 +74,8 @@ export default function Login() {
         { withCredentials: true }
       );
       console.log('Login response:', response); // Debugging line
+      localStorage.setItem('token', response.data.token);
+      document.cookie = `token=${response.data.token}; path=/; secure; SameSite=None`;
       navigate('/home');
     } catch (error) {
       console.error('Login failed:', error.response ? error.response.data : error.message);
