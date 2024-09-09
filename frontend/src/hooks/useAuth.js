@@ -8,7 +8,7 @@ export const useAuth = () => {
     const token = Cookies.get('token'); // Ensure this matches the cookie name set in the backend
     if (!token) {
       console.log('No token found, redirecting to login');
-      navigate('/'); // Redirect to login page if token is not found
+      navigate('/home'); // Redirect to login page if token is not found
     }
   }, [navigate]);
 };
