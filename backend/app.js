@@ -216,7 +216,7 @@ app.post('/login', (req, res) => {
     httpOnly: false,
     secure: true,          // Ensure HTTPS is being used
     sameSite: 'None',      // Required for cross-site cookies
-    path: '/',
+    path: '/home',
   });
 
   console.log(token);
