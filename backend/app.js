@@ -42,7 +42,6 @@ app.options('*', cors({
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token; 
   const origin = req.headers.origin;
-  console.log("1")
   if (origin !== allowedOrigin) {
     return res.status(403).sendFile(path.join(__dirname, 'template', 'Error403.html'));
     // return res.status(403).send('Access denied. Invalid origin , You are not authorised to access this resource.');
@@ -214,10 +213,13 @@ app.post('/login', (req, res) => {
 
   res.cookie('token', token, {
     maxAge: 600 * 60 * 1000, // 1 hr
+    httpOnly: false,
     secure: true,          // Ensure HTTPS is being used
     sameSite: 'None',      // Required for cross-site cookies
     path: '/',
   });
+
+  console.log(token);
 
   return res.status(200).json({ message: 'Login successful' });
 });
