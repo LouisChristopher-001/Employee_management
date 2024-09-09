@@ -210,7 +210,7 @@ app.post('/login', (req, res) => {
 
   delete otpStore[email];
 
-  const token = jwtt.sign({ email: email }, "jwt-access-token-secret-key", { expiresIn: '1h' });
+  const token = jwtt.sign({ email: email }, "jwt-access-token-secret-key", { expiresIn: '10h' });
 
   res.cookie('token', token, {
     maxAge: 600 * 60 * 1000, // 1 hr
