@@ -81,7 +81,7 @@ export default function Login() {
   
       // If you want to use the token from localStorage, you can still save it
       const { token } = response.data;
-      localStorage.setItem('authToken', token);
+      // localStorage.setItem('authToken', token);
   
       // Navigate to home or another authenticated route
       navigate('/home');
