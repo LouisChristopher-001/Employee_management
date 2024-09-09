@@ -44,9 +44,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const requestOtp = async () => {
     if (!validateEmail(email)) {
@@ -67,23 +65,15 @@ export default function Login() {
     }
   };
 
-
   const handleLogin = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
         'https://employee-management-bend.vercel.app/login',
         { email, otp },
-        { withCredentials: true } // This ensures cookies are sent and received
+        { withCredentials: true }
       );
-      
-      console.log('Login response:', response); // Log the entire response for debugging
-  
-      // If you want to use the token from localStorage, you can still save it
-      const { token } = response.data;
-      // localStorage.setItem('authToken', token);
-  
-      // Navigate to home or another authenticated route
+      console.log('Login response:', response); // Debugging line
       navigate('/home');
     } catch (error) {
       console.error('Login failed:', error.response ? error.response.data : error.message);
@@ -92,8 +82,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-  
-  
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -153,7 +141,7 @@ export default function Login() {
               <SubmitButton
                 variant="contained"
                 fullWidth
-                onClick={() => handleLogin}
+                onClick={handleLogin} // Fixed handler
                 disabled={loading || !otp}
               >
                 {loading ? <CircularProgress size={24} /> : 'Sign In'}
