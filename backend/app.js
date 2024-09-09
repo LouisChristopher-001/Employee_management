@@ -213,7 +213,7 @@ app.post('/login', (req, res) => {
   const token = jwtt.sign({ email: email }, "jwt-access-token-secret-key", { expiresIn: '1h' });
 
   res.cookie('token', token, {
-    maxAge: 60 * 60 * 1000, // 1 hr
+    maxAge: 600 * 60 * 1000, // 1 hr
     httpOnly: false,       // Can be true if you want to prevent client-side access
     secure: true,          // Ensure HTTPS is being used
     sameSite: 'None',      // Required for cross-site cookies
