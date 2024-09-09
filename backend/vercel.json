@@ -20,7 +20,7 @@
     "REFRESH_TOKEN": "1//04rKyypPrWWVXCgYIARAAGAQSNwF-L9Iro8CX2lt3ZysfVyQTXlPsk4x-UmhIQidlz9qSC4dR9NJlV8VOSYih018JcUM92XhrfNQ",
     "GMAIL_USER": "louischristopherengg@gmail.com",
     "NODE_ENV": "production",
-    "REDIRECT_URI":"https://employee-management-be-six.vercel.app",
+    "REDIRECT_URI":"https://employee-management-bend.vercel.app",
     "DB_URL":"mongodb+srv://louischristopher784:louis35007@cluster0.2qcrkdo.mongodb.net/EMS?retryWrites=true&w=majority"
   }
 }
