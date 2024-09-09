@@ -72,7 +72,7 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://employee-management-be-six.vercel.app/login',
+        'https://employee-management-bend.vercel.app/login',
         { email, otp },
         { withCredentials: true } // This ensures cookies are sent and received
       );
