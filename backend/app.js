@@ -40,16 +40,11 @@ app.options('*', cors({
 }));
 
 const verifyToken = (req, res, next) => {
-<<<<<<< HEAD
-  const token = req.cookies.token; 
-  console.log(token);
-=======
   // Extract token from Authorization header
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];  // Split "Bearer <token>" and get token
 
   console.log('Token:', token);  // Debugging output
->>>>>>> 49a8d33a3fbff14869150761f4d6d32a713bfe4c
   const origin = req.headers.origin;
 
   if (origin !== allowedOrigin) {
