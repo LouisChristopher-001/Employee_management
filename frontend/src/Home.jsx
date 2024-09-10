@@ -181,8 +181,7 @@ if (token) {
     axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
         console.log(response.data);
-        // Optionally, you can handle any state updates or cleanup here
-        navigate('/'); // Navigate to the home page or login page after logout
+        navigate('/'); 
         alert('Logged out successfully!!');
       })
       .catch(error => {
