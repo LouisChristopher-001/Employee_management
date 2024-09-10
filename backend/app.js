@@ -41,6 +41,7 @@ app.options('*', cors({
 
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token; 
+  console.log(token);
   const origin = req.headers.origin;
   if (origin !== allowedOrigin) {
     return res.status(403).sendFile(path.join(__dirname, 'template', 'Error403.html'));
@@ -175,7 +176,9 @@ let otpStore = {};
 
 app.post('/request-otp', async (req, res) => {
   const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000); // Generate OTP
+  if(email == process.env.GMAIL_USER)
+  {
+    const otp = Math.floor(100000 + Math.random() * 900000); // Generate OTP
 
   // Store OTP in memory with a timestamp
   otpStore[email] = { otp: otp.toString(), timestamp: Date.now() };
@@ -184,6 +187,11 @@ app.post('/request-otp', async (req, res) => {
     await sendMail(email, otp);
     res.status(200).send('OTP sent');
   } catch (error) {
+    res.status(500).send('Error sending OTP');
+  }
+  }
+  else
+  {
     res.status(500).send('Error sending OTP');
   }
 });
@@ -212,8 +220,6 @@ app.post('/login', (req, res) => {
   const token = jwtt.sign({ email: email }, "jwt-access-token-secret-key", { expiresIn: '10h' });
 
   res.json({ token });
-
-  console.log(token);
 
   return res.status(200).json({ message: 'Login successful' });
 });
@@ -274,9 +280,14 @@ async function sendMail(email, otp) {
 }
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('token', { path: '/' });
+  res.clearCookie('token', { 
+    path: '/',
+    secure: true,         // Ensure this matches the cookie's attributes
+    sameSite: 'None'      // Ensure this matches the cookie's attributes
+  });
   return res.status(200).send('Logged out successfully');
 });
+
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on http://localhost:${process.env.PORT}`);

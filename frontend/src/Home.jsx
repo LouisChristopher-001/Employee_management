@@ -121,7 +121,6 @@ export default function Home() {
 if (token) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
-
   useEffect(() => {
     axios.get('https://employee-management-bend.vercel.app/',{ withCredentials: true })
       .then(response => {

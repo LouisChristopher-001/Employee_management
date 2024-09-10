@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, Card, CardContent, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -43,6 +43,19 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
+      .then(response => {
+        console.log(response.data);
+        // Optionally, you can handle any state updates or cleanup here
+        navigate('/'); // Navigate to the home page or login page after logout
+        alert('Logged out successfully!!');
+      })
+      .catch(error => {
+        console.error('Error during logout:', error);
+      });
+  },[]);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
