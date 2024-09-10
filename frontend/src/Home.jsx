@@ -175,11 +175,11 @@ if (token) {
     setCurrentPage(1);
   };
 
-  const handleLogout = () => {
+ const handleLogout = () => {
     
     axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
-        console.log(response.data);
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; SameSite=None';
         navigate('/'); 
         alert('Logged out successfully!!');
       })
