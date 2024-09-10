@@ -40,26 +40,32 @@ app.options('*', cors({
 }));
 
 const verifyToken = (req, res, next) => {
-  const token = req.cookies.token; 
-  console.log(token);
+  // Extract token from Authorization header
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];  // Split "Bearer <token>" and get token
+
+  console.log('Token:', token);  // Debugging output
   const origin = req.headers.origin;
+
   if (origin !== allowedOrigin) {
     return res.status(403).sendFile(path.join(__dirname, 'template', 'Error403.html'));
     // return res.status(403).send('Access denied. Invalid origin , You are not authorised to access this resource.');
   }
+
   if (!token) {
     return res.status(401).send('Access denied. No token provided.');
   }
 
   try {
     const decoded = jwtt.verify(token, "jwt-access-token-secret-key");
-    req.user = decoded; 
+    req.user = decoded;
     
-    next(); 
+    next();
   } catch (error) {
     return res.status(400).send('Invalid token.');
   }
 };
+
 const getLatestSequence = require(path.join(__dirname,'middleware','sequence'));
 
 const addemp = require(path.join(__dirname, 'routes', 'addemp'));
