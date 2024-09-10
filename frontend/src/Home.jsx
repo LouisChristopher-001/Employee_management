@@ -117,6 +117,10 @@ export default function Home() {
   const [statusOptions] = useState(['Active', 'Terminated', 'Retired', 'Resigned']);
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+if (token) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
 
   useEffect(() => {
     axios.get('https://employee-management-bend.vercel.app/',{ withCredentials: true })
