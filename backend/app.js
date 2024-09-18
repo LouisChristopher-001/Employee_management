@@ -14,6 +14,7 @@ const fs = require('fs');
 const multer = require('multer');
 const EmployeeModel = require('./models/employees');
 const SequenceModel = require('./models/seq');
+const { Domain } = require('domain');
 
 
 app.use(cookieParser());
@@ -289,7 +290,7 @@ app.post('/logout', (req, res) => {
   res.clearCookie('token', { 
     path: '/',
     secure: true,         // Ensure this matches the cookie's attributes
-    sameSite: 'None'      // Ensure this matches the cookie's attributes
+    sameSite: 'None' ,     // Ensure this matches the cookie's attributes
   });
   return res.status(200).send('Logged out successfully');
 });

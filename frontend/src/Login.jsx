@@ -47,10 +47,9 @@ export default function Login() {
   useEffect(() => {
     axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
-        console.log(response.data);
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; SameSite=None';
         // Optionally, you can handle any state updates or cleanup here
         navigate('/'); // Navigate to the home page or login page after logout
-        alert('Logged out successfully!!');
       })
       .catch(error => {
         console.error('Error during logout:', error);
