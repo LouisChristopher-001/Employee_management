@@ -44,7 +44,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
+   useEffect(() => {
     axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
         document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; SameSite=None';

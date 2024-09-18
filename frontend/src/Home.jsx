@@ -175,7 +175,7 @@ if (token) {
     setCurrentPage(1);
   };
 
-  const handleLogout = () => {
+ const handleLogout = () => {
     
     axios.post('https://employee-management-bend.vercel.app/logout', {}, { withCredentials: true })
       .then(response => {
