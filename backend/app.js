@@ -183,8 +183,8 @@ let otpStore = {};
 
 app.post('/request-otp', async (req, res) => {
   const { email } = req.body;
-  if(email == process.env.GMAIL_USER)
-  {
+  // if(email == process.env.GMAIL_USER)
+  // {
     const otp = Math.floor(100000 + Math.random() * 900000); // Generate OTP
 
   // Store OTP in memory with a timestamp
@@ -196,11 +196,11 @@ app.post('/request-otp', async (req, res) => {
   } catch (error) {
     res.status(500).send('Error sending OTP');
   }
-  }
-  else
-  {
+  // }
+  // else
+  // {
     res.status(500).send('Error sending OTP');
-  }
+  // }
 });
 
 app.post('/login', (req, res) => {
