@@ -183,7 +183,7 @@ let otpStore = {};
 
 app.post('/request-otp', async (req, res) => {
   const { email } = req.body;
-  if(email === "jeremiah.prakash.in@gmail.com")
+  if(email === process.env.GMAIL_USER)
   {
     const otp = Math.floor(100000 + Math.random() * 900000); // Generate OTP
 
